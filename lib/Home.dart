@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+import 'package:path_provider/path_provider.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -8,6 +12,14 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   List _listTarefas = [];
+
+  _salvarArquivo () async {
+    final diretorio = await getApplicationDocumentsDirectory();
+    var arquivo = File("${diretorio.path}/dados.json");
+
+    String dados = json.encode(_listTarefas);
+    arquivo.writeAsString(dados);
+  }
 
   @override
   Widget build(BuildContext context) {

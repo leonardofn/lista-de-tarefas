@@ -13,12 +13,34 @@ class _HomeState extends State<Home> {
 
   List _listTarefas = [];
 
-  _salvarArquivo () async {
+  Future<File> _getFile () async {
     final diretorio = await getApplicationDocumentsDirectory();
-    var arquivo = File("${diretorio.path}/dados.json");
+    return File("${diretorio.path}/dados.json");
+  }
 
+  _salvarArquivo () async {
+    var arquivo = await _getFile();
     String dados = json.encode(_listTarefas);
     arquivo.writeAsString(dados);
+  }
+
+  _lerArquivo () async {
+    try{
+      final arquivo = await _getFile();
+      return arquivo.readAsString();
+    }catch(e){
+      return null;
+    }
+  }
+
+  @override
+  void initState() { // Executa antes de carregar o método build
+    super.initState();
+    _lerArquivo().then((dados){
+      setState(() {
+        _listTarefas = json.decode(dados);
+      });
+    });
   }
 
   @override

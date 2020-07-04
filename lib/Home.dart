@@ -13,6 +13,7 @@ class _HomeState extends State<Home> {
 
   TextEditingController _controllerTarefa = TextEditingController();
   List _listTarefas = [];
+  Map<String, dynamic> _ultimaTarefaRemovida = Map();
 
   Future<File> _getFile () async {
     final diretorio = await getApplicationDocumentsDirectory();
@@ -57,13 +58,33 @@ class _HomeState extends State<Home> {
   }
 
   Widget criarItemLista (context, index) {
-    final item = _listTarefas[index]["titulo"];
     return Dismissible(
-      key: Key(item),
+      key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
       direction: DismissDirection.endToStart,
       onDismissed: (direction){
+
+        // recuperar ultima tarefa removida da lista
+        _ultimaTarefaRemovida = _listTarefas[index];
         _listTarefas.removeAt(index);
         _salvarArquivo();
+
+        // Snackbar
+        final snackbar = SnackBar(
+          duration: Duration(seconds: 5),
+          content: Text("Tarefa removida!"),
+          action: SnackBarAction(
+            label: "Desfazer",
+            onPressed: (){
+              setState(() {
+                // insere novamente item removido na lista
+                _listTarefas.insert(index, _ultimaTarefaRemovida);
+              });
+              _salvarArquivo();
+            }
+          ),
+        );
+
+        Scaffold.of(context).showSnackBar(snackbar);
       },
       background: Container(
         color: Colors.red,
